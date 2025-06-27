@@ -1,7 +1,9 @@
 import os
 from sys import argv, path
 
-path.append(os.path.dirname(os.path.abspath(__file__)))
+main_file_path = os.path.dirname(os.path.abspath(__file__))
+
+path.append(main_file_path)
 
 from utils import get_and_check_flags
 
@@ -19,7 +21,7 @@ try:
 except:
     error()
 
-output_dir = "images"
+output_dir = os.path.join(main_file_path, "images")
 
 
 def render(model: str, width: int, height: int):
