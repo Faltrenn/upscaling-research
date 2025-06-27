@@ -25,7 +25,7 @@ output_dir = os.path.join(main_file_path, "images")
 
 
 def render(model: str, width: int, height: int):
-    model_file_name = os.path.basename(model).split(".")[0]
+    model_file_name = ".".join(os.path.basename(model).split(".")[:-1])
     file_output = f"{model_file_name}_{width}x{height}.png"
     path_output = os.path.join(output_dir, file_output)
 
