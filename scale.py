@@ -1,5 +1,6 @@
 from PIL import Image
 from sys import argv
+from utils import get_and_check_flags
 
 
 def error():
@@ -11,29 +12,14 @@ def error():
 if len(argv) < 4:
     error()
 
-flags: dict[str, list[str]] = {}
-
-flag = ""
-for arg in argv:
-    if len(arg) > 1 and "-" in arg:
-        flag = arg
-        flags[flag] = []
-        continue
-
-    if flag:
-        flags[flag].append(arg)
-
-keys = flags.keys()
-if not all(flag in keys for flag in ("-f", "-s", "-m")):
-    error()
+flags = get_and_check_flags(argv, ("-f", "-s", "-m"), error)
 
 if len(flags["-m"]) > 1:
     error()
 
-
 for file in flags["-f"]:
     ext = file.split(".")[-1]
-    file_name = "".join(file.split(".")[:-1])
+    file_name = ".".join(file.split(".")[:-1])
 
     img = Image.open(file)
     largura, altura = img.size
