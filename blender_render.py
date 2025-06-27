@@ -36,18 +36,14 @@ def render(model: str, width: int, height: int):
     bpy.ops.render.render(write_still=True)
 
 
-flags = get_and_check_flags(argv, ("-f", "-r"))
+flags = get_and_check_flags(argv, ("-f", "-r"), error)
 
 models = flags["-f"]
-print(models)
 
 resolutions = []
 for res in flags["-r"]:
     splitted = res.split("x")
     resolutions.append([int(splitted[0]), int(splitted[1])])
-
-print(resolutions)
-print(models)
 
 for model in models:
     print(f"Starting {model}")
