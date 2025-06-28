@@ -25,17 +25,14 @@ output_dir = os.path.join(main_file_path, "images")
 
 
 def setup_gpu(device_type: str):
-    bpy.data.scenes[0].render.engine = "CYCLES"
+    cycles_prefs = bpy.context.preferences.addons["cycles"].preferences
+    cycles_prefs.compute_device_type = device_type
+    cycles_prefs.refresh_devices()
 
-    bpy.context.preferences.addons["cycles"].preferences.compute_device_type = device_type
+    for d in cycles_prefs.devices:
+        d.use = True
 
     bpy.context.scene.cycles.device = "GPU"
-
-    bpy.context.preferences.addons["cycles"].preferences.get_devices()
-    print(bpy.context.preferences.addons["cycles"].preferences.compute_device_type)
-    for d in bpy.context.preferences.addons["cycles"].preferences.devices:
-        d["use"] = 1
-        print(d["name"], d["use"])
 
 
 def render(model: str, width: int, height: int, device_type: str = ""):
