@@ -30,11 +30,16 @@ def render(model: str, width: int, height: int, device_type: str = ""):
     path_output = os.path.join(output_dir, file_output)
 
     if device_type:
-        bpy.context.scene.render.engine = 'CYCLES'
+        prefs = bpy.context.preferences
+        bpy.context.scene.render.engine = "CYCLES"
         bpy.context.scene.cycles.device = "GPU"
-        bpy.context.preferences.addons["cycles"].preferences.compute_device_type = (
-            device_type.upper() #  "CUDA", "OPTIX", "HIP", "METAL"
-        )
+        cycles_prefs = prefs.addons["cycles"].preferences
+
+        #  "CUDA", "OPTIX", "HIP", "METAL
+        cycles_prefs.compute_device_type = device_type.upper()
+
+        for device in cycles_prefs.devices:
+            device.use = True
 
     bpy.context.scene.render.resolution_x = width
     bpy.context.scene.render.resolution_y = height
