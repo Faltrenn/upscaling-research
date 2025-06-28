@@ -41,6 +41,9 @@ def render(model: str, width: int, height: int, device_type: str = ""):
         for device in cycles_prefs.devices:
             device.use = True
 
+        prefs.use_preferences_save = True
+        prefs.save()
+
     bpy.context.scene.render.resolution_x = width
     bpy.context.scene.render.resolution_y = height
     bpy.context.scene.render.filepath = path_output
