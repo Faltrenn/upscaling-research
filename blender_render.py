@@ -25,17 +25,17 @@ output_dir = os.path.join(main_file_path, "images")
 
 
 def setup_gpu(device_type: str):
-    prefs = bpy.context.preferences
-    cycles_prefs = prefs.addons["cycles"].preferences
-    cycles_prefs.compute_device_type = device_type.upper()
+    bpy.data.scenes[0].render.engine = "CYCLES"
 
-    bpy.context.preferences.addons["cycles"].preferences.refresh_devices()
-
-    for device in cycles_prefs.devices:
-        print(f"{device.name} ({device.type})")
-        device.use = True
+    bpy.context.preferences.addons["cycles"].preferences.compute_device_type = device_type
 
     bpy.context.scene.cycles.device = "GPU"
+
+    bpy.context.preferences.addons["cycles"].preferences.get_devices()
+    print(bpy.context.preferences.addons["cycles"].preferences.compute_device_type)
+    for d in bpy.context.preferences.addons["cycles"].preferences.devices:
+        d["use"] = 1
+        print(d["name"], d["use"])
 
 
 def render(model: str, width: int, height: int, device_type: str = ""):
@@ -44,7 +44,7 @@ def render(model: str, width: int, height: int, device_type: str = ""):
     path_output = os.path.join(output_dir, file_output)
 
     if device_type:
-        setup_gpu(device_type)
+        setup_gpu(device_type.upper())
 
     bpy.context.scene.render.resolution_x = width
     bpy.context.scene.render.resolution_y = height
