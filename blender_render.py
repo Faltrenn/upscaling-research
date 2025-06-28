@@ -32,6 +32,7 @@ def render(model: str, width: int, height: int):
     bpy.context.scene.render.resolution_x = width
     bpy.context.scene.render.resolution_y = height
     bpy.context.scene.render.filepath = path_output
+    bpy.context.scene.render.image_settings.file_format = "PNG"
 
     bpy.ops.render.render(write_still=True)
 
