@@ -24,10 +24,16 @@ except:
 output_dir = os.path.join(main_file_path, "images")
 
 
-def render(model: str, width: int, height: int):
+def render(model: str, width: int, height: int, device_type: str = ""):
     model_file_name = ".".join(os.path.basename(model).split(".")[:-1])
     file_output = f"{model_file_name}_{width}x{height}.png"
     path_output = os.path.join(output_dir, file_output)
+
+    if device_type:
+        bpy.context.scene.cycles.device = "GPU"
+        bpy.context.preferences.addons["cycles"].preferences.compute_device_type = (
+            device_type.upper() #  "CUDA", "OPTIX", "HIP", "METAL"
+        )
 
     bpy.context.scene.render.resolution_x = width
     bpy.context.scene.render.resolution_y = height
@@ -51,5 +57,6 @@ for model in models:
     bpy.ops.wm.open_mainfile(filepath=model)
 
     for width, height in resolutions:
-        render(model, width, height)
+        device_type = flags.get("-dtype", [""])[0]
+        render(model, width, height, device_type)
         print(f"Done {model} {width}x{height}")
