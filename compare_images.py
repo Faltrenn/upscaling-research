@@ -34,6 +34,6 @@ for i in range(width):
 
 error_avr /= width * height * 3
 
-error_percentage = error_avr * 100 / 255
+proximity_percentage = 100 - error_avr * 100 / 255
 
-print(f"Error percentage {error_percentage}%")
+print(f"Proximity percentage {proximity_percentage}%")
