@@ -24,25 +24,27 @@ except:
 output_dir = os.path.join(main_file_path, "images")
 
 
+def setup_gpu(device_type: str):
+    prefs = bpy.context.preferences
+    cycles_prefs = prefs.addons["cycles"].preferences
+    cycles_prefs.compute_device_type = device_type.upper()
+
+    bpy.context.preferences.addons["cycles"].preferences.refresh_devices()
+
+    for device in cycles_prefs.devices:
+        print(f"{device.name} ({device.type})")
+        device.use = True
+
+    bpy.context.scene.cycles.device = "GPU"
+
+
 def render(model: str, width: int, height: int, device_type: str = ""):
     model_file_name = ".".join(os.path.basename(model).split(".")[:-1])
     file_output = f"{model_file_name}_{width}x{height}.png"
     path_output = os.path.join(output_dir, file_output)
 
     if device_type:
-        prefs = bpy.context.preferences
-        bpy.context.scene.render.engine = "CYCLES"
-        bpy.context.scene.cycles.device = "GPU"
-        cycles_prefs = prefs.addons["cycles"].preferences
-
-        #  "CUDA", "OPTIX", "HIP", "METAL
-        cycles_prefs.compute_device_type = device_type.upper()
-
-        for device in cycles_prefs.devices:
-            device.use = True
-
-        prefs.use_preferences_save = True
-        prefs.save()
+        setup_gpu(device_type)
 
     bpy.context.scene.render.resolution_x = width
     bpy.context.scene.render.resolution_y = height
