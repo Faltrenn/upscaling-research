@@ -30,7 +30,7 @@ def setup_gpu(device_type: str):
     cycles_prefs.refresh_devices()
 
     for d in cycles_prefs.devices:
-        d.use = True
+        d.use = d.type == device_type
 
     bpy.context.scene.cycles.device = "GPU"
 
