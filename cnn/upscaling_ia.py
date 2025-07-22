@@ -1,5 +1,5 @@
 import os
-from keras import callbacks, models
+from keras import models
 import numpy as np
 from PIL import Image
 from sys import argv
@@ -77,7 +77,7 @@ def create_training_data(dataset: dict[str, list[str]], scale: int):
 
         output_image_path = IMAGES_PATH + output_image_name
 
-        x = preprocess_image(input_image_path, scale=scale)
+        x = open_normalized_image(input_image_path)
         y = open_normalized_image(output_image_path)
 
         X_train.append(x)
@@ -103,7 +103,7 @@ if mode == "train":
     )
 
     X_train, Y_train = create_training_data(dataset, scale)
-    srcnn_model = create_model(input_shape=X_train.shape[1:])
+    srcnn_model = create_model(X_train.shape[1:], scale)
     srcnn_model.compile(optimizer="adam", loss="mean_squared_error")
     srcnn_model.fit(
         X_train, Y_train, epochs=epochs, batch_size=16, callbacks=[early_stop]
@@ -118,16 +118,19 @@ output_path = argv[5]
 
 model = models.load_model(model_path)
 
-input_image = preprocess_image(input_path, scale=scale)
+input_image = preprocess_image(input_path, scale)
 input_image = np.expand_dims(input_image, axis=0)
 
 print(f"Upscaling image {input_path} in {scale}x")
 
-predicted_image = np.squeeze(model.predict(input_image) * 255)  # type: ignore
+predicted_image = np.squeeze(np.clip(model.predict(input_image) * 255, 0, 255))  # type: ignore
 predicted_image = predicted_image.astype(np.uint8)
 
 output_image = Image.fromarray(predicted_image).convert("RGB")
 output_image.show()
 output_image.save(output_path)
+
+print(f"Input shape: {input_image.shape}")
+print(f"Predicted shape: {predicted_image.shape}")
 
 Image.open(input_path).convert("RGB").show()

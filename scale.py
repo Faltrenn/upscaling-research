@@ -12,10 +12,7 @@ def error():
 if len(argv) < 4:
     error()
 
-flags = get_and_check_flags(argv, ("-f", "-s", "-m"), error)
-
-if len(flags["-m"]) > 1:
-    error()
+flags = get_and_check_flags(argv, ("-f", "-s"), error)
 
 for file in flags["-f"]:
     ext = file.split(".")[-1]
