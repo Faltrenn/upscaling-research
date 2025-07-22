@@ -33,6 +33,7 @@ def setup_gpu(device_type: str):
         d.use = d.type == device_type
 
     bpy.context.scene.cycles.device = "GPU"
+    print(f"Using {device_type}")
 
 
 def render(model: str, width: int, height: int, device_type: str = ""):
@@ -42,9 +43,13 @@ def render(model: str, width: int, height: int, device_type: str = ""):
 
     if device_type:
         setup_gpu(device_type.upper())
+    else:
+        print(f"Using {device_type}")
 
     bpy.context.scene.render.resolution_x = width
     bpy.context.scene.render.resolution_y = height
+    bpy.context.scene.render.resolution_percentage = 100
+
     bpy.context.scene.render.filepath = path_output
     bpy.context.scene.render.image_settings.file_format = "PNG"
 
@@ -64,7 +69,7 @@ for model in models:
     print(f"Starting {model}")
     bpy.ops.wm.open_mainfile(filepath=model)
 
+    device_type = flags.get("-dtype", [""])[0]
     for width, height in resolutions:
-        device_type = flags.get("-dtype", [""])[0]
         render(model, width, height, device_type)
         print(f"Done {model} {width}x{height}")
