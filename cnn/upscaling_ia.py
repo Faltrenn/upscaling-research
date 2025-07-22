@@ -94,7 +94,7 @@ if mode == "train":
     from keras.callbacks import EarlyStopping
 
     def get_formatted_time() -> str:
-        return datetime.now().strftime("%Y-%m-%d_%H:%M:%S")
+        return datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
 
     epochs = int(argv[3])
 
