@@ -1,8 +1,9 @@
 import os
-from keras import models
+from keras import callbacks, models
 import numpy as np
 from PIL import Image
 from sys import argv
+
 
 def wrong_usage():
     print("WRONG USAGE!")
@@ -90,16 +91,23 @@ def create_training_data(dataset: dict[str, list[str]], scale: int):
 
 if mode == "train":
     from datetime import datetime
+    from keras.callbacks import EarlyStopping
 
     def get_formatted_time() -> str:
         return datetime.now().strftime("%Y-%m-%d_%H:%M:%S")
 
     epochs = int(argv[3])
 
+    early_stop = EarlyStopping(
+        monitor="val_loss", patience=15, restore_best_weights=True
+    )
+
     X_train, Y_train = create_training_data(dataset, scale)
     srcnn_model = create_model(input_shape=X_train.shape[1:])
     srcnn_model.compile(optimizer="adam", loss="mean_squared_error")
-    srcnn_model.fit(X_train, Y_train, epochs=epochs, batch_size=16)
+    srcnn_model.fit(
+        X_train, Y_train, epochs=epochs, batch_size=16, callbacks=[early_stop]
+    )
     srcnn_model.save(f"models/{scale}x_{epochs}_{get_formatted_time()}.keras")
 
     quit(0)
@@ -115,7 +123,7 @@ input_image = np.expand_dims(input_image, axis=0)
 
 print(f"Upscaling image {input_path} in {scale}x")
 
-predicted_image = np.squeeze(model.predict(input_image) * 255) # type: ignore
+predicted_image = np.squeeze(model.predict(input_image) * 255)  # type: ignore
 predicted_image = predicted_image.astype(np.uint8)
 
 output_image = Image.fromarray(predicted_image).convert("RGB")
