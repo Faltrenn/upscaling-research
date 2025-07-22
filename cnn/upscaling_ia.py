@@ -61,7 +61,7 @@ if mode == "predict":
 
 if mode == "predict_all":
     MODELS_PATH = "models/"
-    models = sorted([MODELS_PATH + file for file in os.listdir(MODELS_PATH) if file.endswith(".keras")])
+    models = sorted([MODELS_PATH + file for file in os.listdir(MODELS_PATH) if file.endswith(".keras") and file.startswith(f"{scale}x")])
 
     LOW_IMAGES = sorted(
         [IMAGES_PATH + file for file in os.listdir(IMAGES_PATH) if "320x240" in file]
