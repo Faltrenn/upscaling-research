@@ -2,7 +2,7 @@ from keras import models, layers
 from PIL import Image
 import numpy as np
 import tensorflow as tf
-from keras.callbacks import EarlyStopping, ModelCheckpoint
+from keras.callbacks import ModelCheckpoint
 import os
 
 
@@ -20,13 +20,16 @@ def create_model(input_shape, scale) -> models.Sequential:
     model.add(layers.Conv2D(32, (1, 1), activation="relu", padding="same"))
 
     model.add(layers.UpSampling2D(size=(scale, scale), interpolation="bilinear"))
-    model.add(layers.Conv2D(input_shape[2], (5, 5), activation="relu", padding="same"))
-    
-    # channels = 3
-    # model.add(layers.Conv2D(channels * scale * scale, (5, 5), activation="linear", padding="same", name='conv_before_shuffle'))
-    # model.add(layers.Lambda(pixel_shuffle(scale), name='pixel_shuffle'))
-    # model.add(layers.Conv2D(64, (9, 9), activation="relu", padding="same", name='refine_conv1'))
-    # model.add(layers.Conv2D(channels, (1, 1), activation="linear", padding="same", name='final_conv_refined'))
+
+    # Transpose
+    # model.add(layers.Conv2DTranspose(32, (scale * 2, scale * 2), strides=(scale, scale), padding="same", activation="relu"))
+
+    # Pixel Shuffle
+    # model.add(layers.Conv2D(3 * (scale ** 2), (3, 3), activation="relu", padding="same"))
+    # model.add(layers.Lambda(pixel_shuffle(scale)))
+
+    model.add(layers.Conv2D(3, (5, 5), activation="linear", padding="same"))
+    # model.add(layers.Conv2D(3, (5, 5), activation="sigmoid", padding="same"))
 
     return model
 
