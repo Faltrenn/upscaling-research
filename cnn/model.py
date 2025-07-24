@@ -4,20 +4,29 @@ import numpy as np
 import tensorflow as tf
 from keras.callbacks import EarlyStopping
 import os
-from datetime import datetime
 
 
 IMAGES_PATH = "../images/"
+
+def pixel_shuffle(scale):
+    return lambda x: tf.nn.depth_to_space(x, scale)
 
 
 def create_model(input_shape, scale) -> models.Sequential:
     model = models.Sequential()
     model.add(layers.Input(shape=input_shape))
+
     model.add(layers.Conv2D(64, (9, 9), activation="relu", padding="same"))
     model.add(layers.Conv2D(32, (1, 1), activation="relu", padding="same"))
 
-    model.add(layers.Conv2D(3 * scale * scale, (5, 5), activation="linear", padding="same"))
-    model.add(layers.Lambda(lambda x: tf.nn.depth_to_space(x, scale)))
+    model.add(layers.UpSampling2D(size=(scale, scale), interpolation="bilinear"))
+    model.add(layers.Conv2D(input_shape[2], (5, 5), activation="relu", padding="same"))
+    
+    # channels = 3
+    # model.add(layers.Conv2D(channels * scale * scale, (5, 5), activation="linear", padding="same", name='conv_before_shuffle'))
+    # model.add(layers.Lambda(pixel_shuffle(scale), name='pixel_shuffle'))
+    # model.add(layers.Conv2D(64, (9, 9), activation="relu", padding="same", name='refine_conv1'))
+    # model.add(layers.Conv2D(channels, (1, 1), activation="linear", padding="same", name='final_conv_refined'))
 
     return model
 
@@ -92,10 +101,6 @@ def predict(model_path:str, scale: int, input_path: str, output_filename: str):
     output_image.save(PREDICTS_MODEL_PATH + output_filename)
 
 
-def get_formatted_time() -> str:
-    return datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-
-
 def train(model_name:str, epochs: int, scale: int, patience: int = 50):
     IMAGES_IN_PATH = sorted(
         [file for file in os.listdir(IMAGES_PATH) if file.endswith(".png")]
@@ -123,6 +128,6 @@ def train(model_name:str, epochs: int, scale: int, patience: int = 50):
     srcnn_model.fit(
         X_train, Y_train, epochs=epochs, batch_size=16, callbacks=[early_stop]
     )
-    srcnn_model.save(f"models/{scale}x_{epochs}_{model_name}_{get_formatted_time()}.keras")
+    srcnn_model.save(f"models/{scale}x_{epochs}_{model_name}.keras")
 
     quit(0)
