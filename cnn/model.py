@@ -2,7 +2,7 @@ from keras import models, layers
 from PIL import Image
 import numpy as np
 import tensorflow as tf
-from keras.callbacks import EarlyStopping
+from keras.callbacks import EarlyStopping, ModelCheckpoint
 import os
 
 
@@ -118,16 +118,25 @@ def train(model_name:str, epochs: int, scale: int, patience: int = 50):
             if "_".join(image.split("_")[:-1]) == image_name and image != input
         ]
 
-    early_stop = EarlyStopping(
-        monitor="loss", patience=patience, restore_best_weights=True
+    filename = f"models/{scale}x_{epochs}_{model_name}.keras"
+
+    checkpoint = ModelCheckpoint(
+        filename,
+        monitor="loss",
+        verbose=0,
+        save_best_only=True,
+        save_weights_only=False,
+        mode="auto",
+        save_freq="epoch",
+        initial_value_threshold=None,
     )
 
     X_train, Y_train = create_training_data(dataset, scale)
     srcnn_model = create_model(X_train.shape[1:], scale)
     srcnn_model.compile(optimizer="adam", loss="mean_squared_error")
     srcnn_model.fit(
-        X_train, Y_train, epochs=epochs, batch_size=16, callbacks=[early_stop]
+        X_train, Y_train, epochs=epochs, batch_size=16, callbacks=[checkpoint]
     )
-    srcnn_model.save(f"models/{scale}x_{epochs}_{model_name}.keras")
+    srcnn_model.save(filename)
 
     quit(0)
