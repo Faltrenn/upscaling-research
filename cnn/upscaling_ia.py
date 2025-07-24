@@ -63,7 +63,7 @@ if mode == "predict":
 if mode == "predict_all":
     MODELS_PATH = "models/"
     models_paths = []
-    if argc < 3:
+    if argc < 4:
         models_paths = sorted([
             MODELS_PATH + file
             for file in os.listdir(MODELS_PATH)
