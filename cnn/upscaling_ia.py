@@ -78,7 +78,7 @@ if mode == "predict_all":
 
     for model_path in models_paths:
         print(f"USING MODEL {model_path}")
-        models.load_model(model_path).summary()
+        models.load_model(model_path).summary() # type: ignore
         
         for i, low_image in enumerate(LOW_IMAGES):
             predict(model_path, scale, low_image, f"{i}.png")
