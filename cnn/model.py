@@ -137,6 +137,6 @@ def train(model_name:str, epochs: int, scale: int, patience: int = 50):
     srcnn_model.fit(
         X_train, Y_train, epochs=epochs, batch_size=16, callbacks=[checkpoint]
     )
-    srcnn_model.save(filename)
+    srcnn_model.save(filename, save_format="keras")
 
     quit(0)
